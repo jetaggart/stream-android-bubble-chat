@@ -1,22 +1,29 @@
 package com.example.bubblechat
 
-import android.R.attr.*
 import android.content.Context
 import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import com.getstream.sdk.chat.adapter.BaseMessageListItemViewHolder
 import com.getstream.sdk.chat.adapter.MessageListItem
+import com.getstream.sdk.chat.adapter.MessageViewHolderFactory.MESSAGEITEM_DATE_SEPARATOR
+import com.getstream.sdk.chat.adapter.MessageViewHolderFactory.MESSAGEITEM_MESSAGE
+import com.getstream.sdk.chat.model.ModelType
 import com.getstream.sdk.chat.rest.response.ChannelState
 import com.getstream.sdk.chat.view.MessageListViewStyle
 import top.defaults.drawabletoolbox.DrawableBuilder
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
 
 
 class MyMessageListItemViewHolder(resId: Int, viewGroup: ViewGroup?) :
     BaseMessageListItemViewHolder(resId, viewGroup) {
     private var tv_text: TextView? = null
+    private var tv_username: TextView? = null
     private var position: Int? = null
     private var context: Context? = null
     private var channelState: ChannelState? = null
@@ -25,6 +32,7 @@ class MyMessageListItemViewHolder(resId: Int, viewGroup: ViewGroup?) :
 
     init {
         tv_text = itemView.findViewById(R.id.tv_text)
+        tv_username = itemView.findViewById(R.id.tv_username)
     }
 
     override fun bind(
@@ -41,7 +49,48 @@ class MyMessageListItemViewHolder(resId: Int, viewGroup: ViewGroup?) :
         init()
     }
 
-    private fun init() { // Configure UIs
+    private fun init() {
+        when (messageListItem!!.type) {
+            MESSAGEITEM_DATE_SEPARATOR -> {
+                configDate()
+            }
+            MESSAGEITEM_MESSAGE -> {
+                configUsername()
+                configText()
+            }
+            else -> {
+                tv_text!!.visibility = View.GONE
+                tv_username!!.visibility = View.GONE
+            }
+        }
+    }
+
+    private fun configDate() {
+        tv_text!!.visibility = View.VISIBLE
+        tv_username!!.visibility = View.GONE
+        tv_text!!.text = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT)
+            .format(messageListItem!!.date)
+    }
+
+    private fun configUsername() {
+        if (channelState!!.members.size == 2) {
+            tv_username!!.visibility == View.GONE
+            return
+        }
+
+        tv_username!!.text = messageListItem!!.message.user.name
+        val params =
+            tv_username!!.layoutParams as ConstraintLayout.LayoutParams
+        if (messageListItem!!.isMine) {
+            params.horizontalBias = 1f
+            params.rightMargin = 50
+        } else {
+            params.horizontalBias = 0f
+            params.leftMargin = 50
+        }
+    }
+
+    private fun configText() {
         tv_text!!.visibility = View.VISIBLE
         tv_text!!.text = messageListItem!!.message.text
         val color = if (messageListItem!!.isMine) {
@@ -65,6 +114,17 @@ class MyMessageListItemViewHolder(resId: Int, viewGroup: ViewGroup?) :
             )
             .build()
         tv_text!!.background = background
+        val params =
+            tv_text!!.layoutParams as ConstraintLayout.LayoutParams
+        if (messageListItem!!.isMine) {
+            params.horizontalBias = 1f
+            params.rightMargin = 25
+            params.leftMargin = 250
+        } else {
+            params.horizontalBias = 0f
+            params.rightMargin = 250
+            params.leftMargin = 25
+        }
     }
 
     override fun setStyle(style: MessageListViewStyle) {
