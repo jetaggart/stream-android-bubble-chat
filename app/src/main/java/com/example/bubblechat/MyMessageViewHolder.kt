@@ -4,11 +4,13 @@ import android.content.Context
 import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Space
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import com.getstream.sdk.chat.adapter.BaseMessageListItemViewHolder
 import com.getstream.sdk.chat.adapter.MessageListItem
+import com.getstream.sdk.chat.adapter.MessageViewHolderFactory
 import com.getstream.sdk.chat.adapter.MessageViewHolderFactory.MESSAGEITEM_DATE_SEPARATOR
 import com.getstream.sdk.chat.adapter.MessageViewHolderFactory.MESSAGEITEM_MESSAGE
 import com.getstream.sdk.chat.model.ModelType
@@ -22,6 +24,7 @@ import java.time.format.DateTimeFormatter
 
 class MyMessageListItemViewHolder(resId: Int, viewGroup: ViewGroup?) :
     BaseMessageListItemViewHolder(resId, viewGroup) {
+    private var space_header: Space? = null
     private var tv_text: TextView? = null
     private var tv_username: TextView? = null
     private var position: Int? = null
@@ -31,6 +34,7 @@ class MyMessageListItemViewHolder(resId: Int, viewGroup: ViewGroup?) :
     private var set: ConstraintSet? = null
 
     init {
+        space_header = itemView.findViewById(R.id.space_header)
         tv_text = itemView.findViewById(R.id.tv_text)
         tv_username = itemView.findViewById(R.id.tv_username)
     }
@@ -57,8 +61,10 @@ class MyMessageListItemViewHolder(resId: Int, viewGroup: ViewGroup?) :
             MESSAGEITEM_MESSAGE -> {
                 configUsername()
                 configText()
+                configSpacing()
             }
             else -> {
+                space_header!!.visibility = View.GONE
                 tv_text!!.visibility = View.GONE
                 tv_username!!.visibility = View.GONE
             }
@@ -74,7 +80,12 @@ class MyMessageListItemViewHolder(resId: Int, viewGroup: ViewGroup?) :
 
     private fun configUsername() {
         if (channelState!!.members.size == 2) {
-            tv_username!!.visibility == View.GONE
+            tv_username!!.visibility = View.GONE
+            return
+        }
+
+        if (!messageListItem!!.positions.contains(MessageViewHolderFactory.Position.TOP)) {
+            tv_username!!.visibility = View.GONE
             return
         }
 
@@ -124,6 +135,13 @@ class MyMessageListItemViewHolder(resId: Int, viewGroup: ViewGroup?) :
             params.horizontalBias = 0f
             params.rightMargin = 250
             params.leftMargin = 25
+        }
+    }
+
+    private fun configSpacing() {
+        if (!messageListItem!!.positions.contains(MessageViewHolderFactory.Position.TOP)) {
+            space_header!!.visibility = View.VISIBLE
+            space_header!!.layoutParams.height = 5
         }
     }
 
