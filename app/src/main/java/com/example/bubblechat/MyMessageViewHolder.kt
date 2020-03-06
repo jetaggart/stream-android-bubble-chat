@@ -76,12 +76,7 @@ class MyMessageListItemViewHolder(resId: Int, viewGroup: ViewGroup?) :
     }
 
     private fun configUsername() {
-        if (channelState!!.members.size == 2) {
-            tv_username!!.visibility = View.GONE
-            return
-        }
-
-        if (!messageListItem!!.positions.contains(MessageViewHolderFactory.Position.TOP)) {
+        if (channelState!!.members.size == 2 || messageListItem!!.isMine || !isTop()) {
             tv_username!!.visibility = View.GONE
             return
         }
@@ -110,26 +105,26 @@ class MyMessageListItemViewHolder(resId: Int, viewGroup: ViewGroup?) :
         val params = tv_text!!.layoutParams as ConstraintLayout.LayoutParams
         if (messageListItem!!.isMine) {
             params.horizontalBias = 1f
+            tv_text!!.setPadding(dpToPixel(10f), dpToPixel(5f), dpToPixel(15f), dpToPixel(5f))
             if (isBottom()) {
                 tv_text!!.setBackgroundResource(R.drawable.bubble_right_tail)
             } else {
                 tv_text!!.setBackgroundResource(R.drawable.bubble_right)
             }
-            tv_text!!.setPadding(dpToPixel(10f), dpToPixel(5f), dpToPixel(15f), dpToPixel(5f))
         } else {
             params.horizontalBias = 0f
+            tv_text!!.setPadding(dpToPixel(15f), dpToPixel(5f), dpToPixel(10f), dpToPixel(5f))
             if (isBottom()) {
                 tv_text!!.setBackgroundResource(R.drawable.bubble_left_tail)
             } else {
                 tv_text!!.setBackgroundResource(R.drawable.bubble_left)
             }
-            tv_text!!.setPadding(dpToPixel(15f), dpToPixel(5f), dpToPixel(10f), dpToPixel(5f))
         }
 
     }
 
     private fun configSpacing() {
-        if (!messageListItem!!.positions.contains(MessageViewHolderFactory.Position.TOP)) {
+        if (!isTop()) {
             space_header!!.visibility = View.VISIBLE
             space_header!!.layoutParams.height = 5
         }
@@ -137,6 +132,10 @@ class MyMessageListItemViewHolder(resId: Int, viewGroup: ViewGroup?) :
 
     private fun isBottom(): Boolean {
         return messageListItem!!.positions.contains(MessageViewHolderFactory.Position.BOTTOM)
+    }
+
+    private fun isTop(): Boolean {
+       return messageListItem!!.positions.contains(MessageViewHolderFactory.Position.TOP)
     }
 
     override fun setStyle(style: MessageListViewStyle) {
