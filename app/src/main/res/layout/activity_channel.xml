@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <variable
             name="viewModel"
             type="com.getstream.sdk.chat.viewmodel.ChannelViewModel" />
@@ -13,7 +12,9 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.example.chattutorial.ChannelActivity">
+        android:background="#FFF"
+
+        tools:context="com.example.bubblechat.ChannelActivity">
 
         <com.getstream.sdk.chat.view.ChannelHeaderView
             android:id="@+id/channelHeader"
@@ -30,6 +31,8 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginBottom="10dp"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
             android:background="#FFF"
             app:layout_constraintBottom_toTopOf="@+id/message_input"
             app:layout_constraintEnd_toEndOf="parent"
