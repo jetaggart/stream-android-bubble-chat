@@ -1,7 +1,6 @@
 package com.example.bubblechat
 
 import android.content.Context
-import android.content.res.Resources
 import android.graphics.Color
 import android.util.TypedValue
 import android.view.View
@@ -92,10 +91,10 @@ class MyMessageListItemViewHolder(resId: Int, viewGroup: ViewGroup?) :
             tv_username!!.layoutParams as ConstraintLayout.LayoutParams
         if (messageListItem!!.isMine) {
             params.horizontalBias = 1f
-            params.rightMargin = 50
+            params.rightMargin = 40
         } else {
             params.horizontalBias = 0f
-            params.leftMargin = 50
+            params.leftMargin = 40
         }
     }
 
@@ -110,14 +109,23 @@ class MyMessageListItemViewHolder(resId: Int, viewGroup: ViewGroup?) :
 
         val params = tv_text!!.layoutParams as ConstraintLayout.LayoutParams
         if (messageListItem!!.isMine) {
-            tv_text!!.setBackgroundResource(R.drawable.bubble_right)
-            tv_text!!.setPadding(dpToPixel(10f), dpToPixel(5f), dpToPixel(20f), dpToPixel(5f))
             params.horizontalBias = 1f
+            if (isBottom()) {
+                tv_text!!.setBackgroundResource(R.drawable.bubble_right_tail)
+            } else {
+                tv_text!!.setBackgroundResource(R.drawable.bubble_right)
+            }
+            tv_text!!.setPadding(dpToPixel(10f), dpToPixel(5f), dpToPixel(15f), dpToPixel(5f))
         } else {
-            tv_text!!.setBackgroundResource(R.drawable.bubble_left)
-            tv_text!!.setPadding(dpToPixel(20f), dpToPixel(5f), dpToPixel(10f), dpToPixel(5f))
             params.horizontalBias = 0f
+            if (isBottom()) {
+                tv_text!!.setBackgroundResource(R.drawable.bubble_left_tail)
+            } else {
+                tv_text!!.setBackgroundResource(R.drawable.bubble_left)
+            }
+            tv_text!!.setPadding(dpToPixel(15f), dpToPixel(5f), dpToPixel(10f), dpToPixel(5f))
         }
+
     }
 
     private fun configSpacing() {
