@@ -1,7 +1,9 @@
 package com.example.bubblechat
 
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Color
+import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Space
@@ -13,13 +15,9 @@ import com.getstream.sdk.chat.adapter.MessageListItem
 import com.getstream.sdk.chat.adapter.MessageViewHolderFactory
 import com.getstream.sdk.chat.adapter.MessageViewHolderFactory.MESSAGEITEM_DATE_SEPARATOR
 import com.getstream.sdk.chat.adapter.MessageViewHolderFactory.MESSAGEITEM_MESSAGE
-import com.getstream.sdk.chat.model.ModelType
 import com.getstream.sdk.chat.rest.response.ChannelState
 import com.getstream.sdk.chat.view.MessageListViewStyle
-import top.defaults.drawabletoolbox.DrawableBuilder
 import java.text.DateFormat
-import java.text.SimpleDateFormat
-import java.time.format.DateTimeFormatter
 
 
 class MyMessageListItemViewHolder(resId: Int, viewGroup: ViewGroup?) :
@@ -104,37 +102,21 @@ class MyMessageListItemViewHolder(resId: Int, viewGroup: ViewGroup?) :
     private fun configText() {
         tv_text!!.visibility = View.VISIBLE
         tv_text!!.text = messageListItem!!.message.text
-        val color = if (messageListItem!!.isMine) {
+        if (messageListItem!!.isMine) {
             tv_text!!.setTextColor(Color.WHITE)
-            Color.rgb(0, 122, 255)
         } else {
             tv_text!!.setTextColor(Color.BLACK)
-            Color.rgb(229, 229, 234)
         }
 
-        val background = DrawableBuilder()
-            .rectangle()
-            .strokeColor(color)
-            .strokeWidth(10)
-            .solidColor(color)
-            .cornerRadii(
-                20,
-                20,
-                20,
-                20
-            )
-            .build()
-        tv_text!!.background = background
-        val params =
-            tv_text!!.layoutParams as ConstraintLayout.LayoutParams
+        val params = tv_text!!.layoutParams as ConstraintLayout.LayoutParams
         if (messageListItem!!.isMine) {
+            tv_text!!.setBackgroundResource(R.drawable.bubble_right)
+            tv_text!!.setPadding(dpToPixel(10f), dpToPixel(5f), dpToPixel(20f), dpToPixel(5f))
             params.horizontalBias = 1f
-            params.rightMargin = 25
-            params.leftMargin = 250
         } else {
+            tv_text!!.setBackgroundResource(R.drawable.bubble_left)
+            tv_text!!.setPadding(dpToPixel(20f), dpToPixel(5f), dpToPixel(10f), dpToPixel(5f))
             params.horizontalBias = 0f
-            params.rightMargin = 250
-            params.leftMargin = 25
         }
     }
 
@@ -145,7 +127,19 @@ class MyMessageListItemViewHolder(resId: Int, viewGroup: ViewGroup?) :
         }
     }
 
+    private fun isBottom(): Boolean {
+        return messageListItem!!.positions.contains(MessageViewHolderFactory.Position.BOTTOM)
+    }
+
     override fun setStyle(style: MessageListViewStyle) {
         // nothing
+    }
+
+    private fun dpToPixel(dp: Float): Int {
+        return TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            dp,
+            itemView.resources.displayMetrics
+        ).toInt()
     }
 }
