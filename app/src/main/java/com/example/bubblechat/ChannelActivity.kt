@@ -36,7 +36,7 @@ class ChannelActivity : AppCompatActivity(),
         // most the business logic of the chat is handled in the ChannelViewModel view model
         binding!!.lifecycleOwner = this
 
-        var channel = client.channel(channelType, channelID)
+        val channel = client.channel(channelType, channelID)
         viewModel = ViewModelProviders.of(
             this,
             ChannelViewModelFactory(this.application, channel)
@@ -47,7 +47,7 @@ class ChannelActivity : AppCompatActivity(),
 
         // connect the view model
         binding!!.viewModel = viewModel
-        binding!!.messageList.setViewHolderFactory(MyMessageViewHolderFactory())
+        binding!!.messageList.setViewHolderFactory(BubbleMessageViewHolderFactory())
         binding!!.messageList.setViewModel(viewModel!!, this)
         binding!!.messageInput.setViewModel(viewModel, this)
         binding!!.channelHeader.setViewModel(viewModel, this)
