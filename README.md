@@ -10,7 +10,7 @@ The source code is available [here](https://github.com/psylinse/stream-android-b
 
 ## Prerequisites 
 
-This post assumes a working knowledge of Android. If you're brand new, it may be useful to check out a [getting started](https://developer.android.com/training/basics/firstapp) guide. If you'd like to run the code, you'll need a Stream account. Please [register here](https://getstream.io/chat/trial/). Once you're registered you'll see a Stream app with an `App Id`, `API Key`, and `Secret`. 
+This post assumes a working knowledge of Android and Kotlin. If you're unfamiliar, it may be useful to check out a [getting started](https://developer.android.com/training/basics/firstapp) guide. If you'd like to run the code, you'll need a Stream account. Please [register here](https://getstream.io/chat/trial/). Once you're registered you'll see a Stream app with an `App Id`, `API Key`, and `Secret`. 
 
 
 ![](images/stream-app.png)
@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
 
 First, we initialize our `StreamChat` instance with our API key. We configure it with the user who'll be using our application. To keep things simple, we'll just declare who's logged in and their frontend token. In a real application, you'd want to perform authentication with a [backend](https://getstream.io/blog/tutorial-user-auth-with-stream-chat-feeds/) that generates this token.
 
-We also give the user a user id, a name, and a profile image. Once we've done this we can declare the layout `activity_main`. The view needs a view model. In this case, we'll simply use the default Stream provided `ChannelListViewModel`. This is great, as it does all the work to interact with Stream's API. We simply need to configure it to [filter](https://getstream.io/chat/docs/query_channels/?language=js) for our user's id. 
+We also give the user a user id, a name, and a profile image. Once we've done this we can declare the layout `activity_main`. The view needs a view model. In this case, we'll simply use the default Stream provided `ChannelListViewModel`. This is great, as it does all the work to interact with Stream's API. We simply need to configure it to [filter](https://getstream.io/chat/docs/query_channels/?language=js) for our user's channels. 
 
 Last thing we do is set a click listener on each channel. We boot a `ChannelActivity` which is where we'll customize the chat messages. Before we look at the code for `ChannelActivity` let's look at the layout:
 
@@ -564,7 +564,7 @@ This is simple since our default spacing is in our layout resource. We simply sh
 
 ![](images/chat-usernames.png)
 
-All that's left is to deal with our date separator messages and we're done! These messages come with no username and just a date. These are used to provide a horizontal separator between messages that are spaced out in time. For example, if you message back a day later, you can break up the view with date marker to inform the user of roughly when messages have come in. Here's `configDate`:
+All that's left is to deal with our date separator messages and we're done! These `MessageListItem`s come with no user and just a date. These are used to provide a horizontal separator between messages that are spaced out in time. These messages are automatically created by Stream when it decides the time between messages has been too long and it'd be nice to group them. For example, if you message back a day later, you can break up the view with date marker to inform the user of roughly when messages have come in. Here's `configDate`:
 
 ```kotlin
 // com/example/bubblechat/BubbleMessageViewHolder.kt:59
@@ -576,7 +576,7 @@ private fun configDate() {
 }
 ```
 
-This is straightforward since our default text view has no styling and the correct spacing. We just need to turn off the username view and add the date. Now we have a nice date separator:
+This is straightforward since our default text view has no styling and the correct spacing. We just need to turn off the username view and add the date. Now we have a convenient date separator:
 
 ![](images/chat-with-date.png)
 
