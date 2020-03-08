@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModelProviders
 import com.example.bubblechat.databinding.ActivityChannelBinding
 import com.getstream.sdk.chat.StreamChat
 import com.getstream.sdk.chat.model.Channel
-import com.getstream.sdk.chat.view.MessageInputView
 import com.getstream.sdk.chat.viewmodel.ChannelViewModel
 import com.getstream.sdk.chat.viewmodel.ChannelViewModelFactory
 
@@ -20,7 +19,6 @@ class ChannelActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val intent = intent
         val channelType = intent.getStringExtra(EXTRA_CHANNEL_TYPE)
         val channelID = intent.getStringExtra(EXTRA_CHANNEL_ID)
         val client = StreamChat.getInstance(application)

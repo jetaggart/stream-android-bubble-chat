@@ -18,7 +18,7 @@ import com.getstream.sdk.chat.view.MessageListViewStyle
 import java.text.DateFormat
 
 
-class BubbleMessageListItemViewHolder(resId: Int, viewGroup: ViewGroup?) :
+class BubbleMessageViewHolder(resId: Int, viewGroup: ViewGroup?) :
     BaseMessageListItemViewHolder(resId, viewGroup) {
     private val header: Space = itemView.findViewById(R.id.space_header)
     private val text: TextView = itemView.findViewById(R.id.tv_text)

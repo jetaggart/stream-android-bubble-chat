@@ -1,6 +1,8 @@
 # Bubble Chat: Building iOS Style Chat in Android with Stream Chat
 
-In this post we explore how to create message bubbles in Android that are similar to WhatsApp and iMessage. We'll customize [Stream Chat Android](https://github.com/GetStream/stream-chat-android)'s built in UI components by plugging in our own message view. This allows us to focus on the text rendering while Stream does everything else.
+In this post, we explore how to do two things: 1) create message bubbles in Android that are similar to WhatsApp and iMessage and 2) how to customize Stream Chat's [UI Components](https://github.com/GetStream/stream-chat-android#ui-components--chat-views). 
+
+We'll customize [Stream Chat Android](https://github.com/GetStream/stream-chat-android)'s built in UI components by plugging in our own message view. This allows us to focus on the text rendering while Stream does everything else.
 
 The source code is available [here](https://github.com/psylinse/stream-android-bubble-chat). Once we're done, we'll have a chat experience that looks like this:
 
@@ -131,6 +133,155 @@ We use a `ConstraintLayout` to hold our `ChannelListView` and `ProgressBar`s. Si
 
 ## Viewing a Channel
 
-Once a user clicks a channel, our `ChannelActivity` starts. First, let's look at how the channel information is given to us. 
+Once a user clicks a channel, our `ChannelActivity` starts. Here is the code:
 
+```kotlin
+// com/example/bubblechat/ChannelActivity.kt:14
+class ChannelActivity : AppCompatActivity() {
+    private var viewModel: ChannelViewModel? = null
+    private var binding: ActivityChannelBinding? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val channelType = intent.getStringExtra(EXTRA_CHANNEL_TYPE)
+        val channelID = intent.getStringExtra(EXTRA_CHANNEL_ID)
+        val client = StreamChat.getInstance(application)
+
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_channel)
+        binding!!.lifecycleOwner = this
+
+        val channel = client.channel(channelType, channelID)
+        viewModel = ViewModelProviders.of(
+            this,
+            ChannelViewModelFactory(this.application, channel)
+        ).get(ChannelViewModel::class.java)
+
+        binding!!.viewModel = viewModel
+        binding!!.messageList.setViewHolderFactory(BubbleMessageViewHolderFactory())
+        binding!!.messageList.setViewModel(viewModel!!, this)
+        binding!!.messageInput.setViewModel(viewModel, this)
+        binding!!.channelHeader.setViewModel(viewModel, this)
+    }
+
+    companion object {
+        private val EXTRA_CHANNEL_TYPE = "com.example.bubblechat.CHANNEL_TYPE"
+        private val EXTRA_CHANNEL_ID = "com.example.bubblechat.CHANNEL_ID"
+
+        fun newIntent(context: Context, channel: Channel): Intent {
+            val intent = Intent(context, ChannelActivity::class.java)
+            intent.putExtra(EXTRA_CHANNEL_TYPE, channel.type)
+            intent.putExtra(EXTRA_CHANNEL_ID, channel.id)
+            return intent
+        }
+    }
+}
+```
+
+First, we get our channel information off of the `Intent` from our `ChannelActivity.newIntent` call in `MainActivity`. We set our content view `activity_channel` and view model:
+
+```xml
+<!-- layout/activity_channel.xml -->
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="viewModel"
+            type="com.getstream.sdk.chat.viewmodel.ChannelViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FFF"
+
+        tools:context="com.example.bubblechat.ChannelActivity">
+
+        <com.getstream.sdk.chat.view.ChannelHeaderView
+            android:id="@+id/channelHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFF"
+            app:streamChannelHeaderBackButtonShow="true"
+            app:layout_constraintEnd_toStartOf="@+id/messageList"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.getstream.sdk.chat.view.MessageListView
+            android:id="@+id/messageList"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="10dp"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:background="#FFF"
+            app:layout_constraintBottom_toTopOf="@+id/message_input"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/channelHeader"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:padding="6dp"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:isGone="@{!safeUnbox(viewModel.loading)}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ProgressBar
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            app:isGone="@{!safeUnbox(viewModel.loadingMore)}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="parent" />
+
+        <com.getstream.sdk.chat.view.MessageInputView
+            android:id="@+id/message_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/messageList" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
+```
+
+Here's another `ConstraintLayout` with some views and progress bars. We use Stream's UI Components to build the majority of the view. `ChannelHeaderView` gives us a nice header with an channel image and channel name. `MessageListView` displays our messages and `MessageInputView` gives us a nice default message input. 
  
+We use the built in Stream view model and feed that to each view. However, we customize the `MessageListView` view by providing a custom message view factory, `BubbleMessageViewHolderFactory`. This factory hooks into Stream's code to provide a custom view for each message. This class is straightforward since all we're going to do is instantiate our bubble message class, `BubbleMessageViewHolder`:
+
+```kotlin
+// com/example/bubblechat/BubbleMessageViewHolderFactory.kt:6
+class BubbleMessageViewHolderFactory : MessageViewHolderFactory() {
+    override fun createMessageViewHolder(
+        adapter: MessageListItemAdapter?,
+        parent: ViewGroup?,
+        viewType: Int
+    ): BaseMessageListItemViewHolder {
+        return BubbleMessageViewHolder(R.layout.bubble_message, parent)
+    }
+}
+ ```
+
+Now that we're hooked into the view rendering, we can customize our messages to look like iMessage or WhatsApp!
+
+## Rendering Custom Bubble Messages
+
