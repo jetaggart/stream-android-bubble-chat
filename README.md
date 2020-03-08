@@ -2,7 +2,7 @@
 
 In this post, we explore how to do two things: 1) create message bubbles in Android that are similar to WhatsApp and iMessage and 2) how to customize Stream Chat's [UI Components](https://github.com/GetStream/stream-chat-android#ui-components--chat-views). 
 
-We'll customize [Stream Chat Android](https://github.com/GetStream/stream-chat-android)'s built in UI components by plugging in our own message view. This allows us to focus on the text rendering while Stream does everything else.
+We'll customize [Stream Chat Android](https://github.com/GetStream/stream-chat-android)'s built-in UI components by plugging in a custom message view. This allows us to focus on the text rendering while Stream does everything else.
 
 The source code is available [here](https://github.com/psylinse/stream-android-bubble-chat). Once we're done, we'll have a chat experience that looks like this:
 
@@ -10,7 +10,7 @@ The source code is available [here](https://github.com/psylinse/stream-android-b
 
 ## Prerequisites 
 
-This post assumes a working knowledge of Android. If you're brand new, it may be useful to check out a [getting started](https://developer.android.com/training/basics/firstapp) guide. If you'd like to run the code, you'll need a Stream account. Please [register here](https://getstream.io/chat/trial/). Once you're registered you'll see an Stream app with an `App Id`, `API Key`, and `Secret`. 
+This post assumes a working knowledge of Android. If you're brand new, it may be useful to check out a [getting started](https://developer.android.com/training/basics/firstapp) guide. If you'd like to run the code, you'll need a Stream account. Please [register here](https://getstream.io/chat/trial/). Once you're registered you'll see a Stream app with an `App Id`, `API Key`, and `Secret`. 
 
 
 ![](images/stream-app.png)
@@ -25,7 +25,7 @@ First, we'll create a view which displays a list of channels for a user to selec
 
 ![](images/channels.png)
 
-This view is mostly taken care of by Stream's UI Components. To list our channels, the `MainActivity.kt` will leverage Stream's [ChannelList](https://github.com/GetStream/stream-chat-android/blob/master/docs/ChannelList.md). We'll configure it to load all of channels for our user. Here's the code:
+This view is mostly taken care of by Stream's UI Components. To list our channels, the `MainActivity.kt` will leverage Stream's [ChannelList](https://github.com/GetStream/stream-chat-android/blob/master/docs/ChannelList.md). We'll configure it to load all of the channels for our user. Here's the code:
 
 ```kotlin
 // com/example/bubblechat/MainActivity.kt:13
@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity() {
 }
 ```
 
-First, we initialize our `StreamChat` instance with our api key. We configure it with the user who'll be using our application. To keep things simple, we'll just declare who's logged in and their frontend token. In a real application, you'd want to perform authentication with a [backend](https://getstream.io/blog/tutorial-user-auth-with-stream-chat-feeds/) that generates this token.
+First, we initialize our `StreamChat` instance with our API key. We configure it with the user who'll be using our application. To keep things simple, we'll just declare who's logged in and their frontend token. In a real application, you'd want to perform authentication with a [backend](https://getstream.io/blog/tutorial-user-auth-with-stream-chat-feeds/) that generates this token.
 
 We also give the user a user id, a name, and a profile image. Once we've done this we can declare the layout `activity_main`. The view needs a view model. In this case, we'll simply use the default Stream provided `ChannelListViewModel`. This is great, as it does all the work to interact with Stream's API. We simply need to configure it to [filter](https://getstream.io/chat/docs/query_channels/?language=js) for our user's id. 
 
@@ -129,7 +129,7 @@ Last thing we do is set a click listener on each channel. We boot a `ChannelActi
 </layout>
 ```
 
-We use a `ConstraintLayout` to hold our `ChannelListView` and `ProgressBar`s. Since the view is mostly taken care of by Stream, we just need to configure when our progress bars show and what our padding and margin is.  
+We use a `ConstraintLayout` to hold our `ChannelListView` and `ProgressBar`s. Since the view is mostly taken care of by Stream, we just need to configure when our progress bars show and what our padding and margin are.  
 
 Now we're ready to view a specific channel.
 
@@ -266,7 +266,7 @@ First, we get our channel information off of the `Intent` from our `ChannelActiv
 </layout>
 ```
 
-Here's another `ConstraintLayout` with some views and progress bars. We use Stream's UI Components to build the majority of the view. `ChannelHeaderView` gives us a nice header with an channel image and channel name. `MessageListView` displays our messages and `MessageInputView` gives us a nice default message input.
+Here's another `ConstraintLayout` with some views and progress bars. We use Stream's UI Components to build the majority of the view. `ChannelHeaderView` gives us a nice header with a channel image and channel name. `MessageListView` displays our messages and `MessageInputView` gives us a nice default message input.
  
 We use the built in Stream view model and feed that to each view. However, we customize the `MessageListView` view by providing a custom message view factory, `BubbleMessageViewHolderFactory`. This factory hooks into Stream's code to provide a custom view for each message. This class is straightforward since all we're going to do is instantiate our bubble message class, `BubbleMessageViewHolder`:
 
@@ -345,9 +345,9 @@ We're passed a view resource from the factory called `bubble_message`. This view
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
 
-This view is quite simple as it defines the three pieces we referenced before, the header spacing, the username, and the text. Notice there's no bubble logic here. In order to get the correct colors and shapes we'll use [drawables](https://developer.android.com/guide/topics/resources/drawable-resource) and some logic in our class to define how the message will look. This layout is simply the scaffolding for us to fill in.
+This view is quite simple as it defines the three pieces we referenced before, the header spacing, the username, and the text. Notice there's no bubble logic here. To get the correct colors and shapes we'll use [drawables](https://developer.android.com/guide/topics/resources/drawable-resource) and some logic in our class to define how the message will look. This layout is simply the scaffolding for us to fill in.
 
-Implementing this abstract class requires us to implement `setStyle` and `bind`. We'll ignore `setStyle` for this tutorial since we define all style here. Check out [`MessageViewListStyle`](https://github.com/GetStream/stream-chat-android/blob/master/library/src/main/java/com/getstream/sdk/chat/view/MessageListViewStyle.java) to see all the ways you can customize the components without building your own class. However, in this post we want to see how to do it ourselves!
+Implementing this abstract class requires us to implement `setStyle` and `bind`. We'll ignore `setStyle` for this tutorial since we define all styles here. Check out [`MessageViewListStyle`](https://github.com/GetStream/stream-chat-android/blob/master/library/src/main/java/com/getstream/sdk/chat/view/MessageListViewStyle.java) to see all the ways you can customize the components without building your own class. However, in this post, we want to see how to do it ourselves!
 
 The `bind` method is where we configure how the message looks:
 
@@ -378,7 +378,7 @@ override fun bind(
 }
 ```
 
-We're given a `ChannelState` and `MessageListItem` which has everything we need to figure out our display. First we check the type of message. Stream has a few different message types which represent different things. For example, you may get a message type that indicates a user is typing, or a date separator. In our case, we'll focus on two, the actual messages and date separators. For any other message type we'll ignore it and remove that message from rendering entirely. 
+We're given a `ChannelState` and `MessageListItem` which has everything we need to figure out our display. First, we check the type of message. Stream has a few different message types which represent different things. For example, you may get a message type that indicates a user is typing or a date separator. In our case, we'll focus on two, the actual messages and date separators. For any other message type, we'll ignore it and remove that message from rendering entirely. 
 
 Let's focus on the actual messages to start. We'll look at how to render the date separators after. Here is our `configMessage` method:
 
@@ -424,7 +424,7 @@ private fun configText() {
 }
 ```
 
-We set the `TextView`'s text then decide if it's "our" message or "theirs". If it's "ours" we display the message on the right in blue. If it's "theirs" it goes left in grey. To set the justification of the message we use `horizontalBias`. Setting it to `1` sets it all the way to the right, `0` to the left. We set the text color based on the background, since blue needs white text and grey needs black. Padding is set differently since the message will have the "tail" on the right or left depending on who's message it is. That tail will cause a different amount of padding depending on what side the message is on.
+We set the `TextView`'s text then decide if it's "our" message or "theirs". If it's "ours" we display the message on the right in blue. If it's "theirs" it goes left in grey. To set the justification of the message we use `horizontalBias`. Setting it to `1` sets it to the right, `0` to the left. We set the text color based on the background since blue needs white text and grey needs black. Padding is set differently since the message will have the "tail" on the right or left depending on who's message it is. That tail will cause a different amount of padding depending on what side the message is on.
 
 Since we're replicating iMessage's style, they don't render the tail unless it's the bottom message. Stream conveniently gives us position information and makes it easy to check message placement within a group of messages:
 
@@ -545,7 +545,7 @@ private fun configUsername() {
 }
 ```
 
-First we decide if we show the username at all. There's three cases where we want it gone. If it's a 1-on-1 chat, if the message is "ours", or if it's not the top of a group of messages (otherwise we'd have usernames on every message within a grouping). This logic means we only label groups of messages from other people in group chats. 
+First, we decide if we show the username at all. There are three cases where we want it gone. If it's a 1-on-1 chat, if the message is "ours", or if it's not the top of a group of messages (otherwise we'd have usernames on every message within a grouping). This logic means we only label groups of messages from other people in group chats. 
 
 If we have that case, we set the text of the username `TextView` to the user's name. We set the bias and margin depending on if it's on the right or the left.
 
@@ -560,7 +560,7 @@ private fun configSpacing() {
 }
 ```
 
-This is simple since our default spacing is in our layout resource. We simple shrink the height if we're not the top message. Now you'll see nice spacing and appropriate tails with usernames in our group chats:
+This is simple since our default spacing is in our layout resource. We simply shrink the height if we're not the top message. Now you'll see nice spacing and appropriate tails with usernames in our group chats:
 
 ![](images/chat-usernames.png)
 
@@ -584,4 +584,4 @@ And we're done! We now have custom bubble messages hooked into Stream.
 
 ## Final Thoughts
 
-Replicating iOS style messages on Android is relatively simple with drawables. Stream makes it even simpler with it's out of the box UI Components. You can start with Stream default views and customize them or build your own when you need. If you want full control, you can ignore the UI Components and use the lower level Stream libraries directly. It's easy to peel back the layers when you need!
+Replicating iOS style messages on Android is relatively simple with drawables. Stream makes it even simpler with it's out of the box UI Components. You can start with Stream default views and customize them or build your own. If you want full control, you can ignore the UI Components and use the lower level Stream libraries directly. It's easy to peel back the layers when you need it!
