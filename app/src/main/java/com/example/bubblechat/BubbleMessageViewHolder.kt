@@ -17,7 +17,6 @@ import com.getstream.sdk.chat.rest.response.ChannelState
 import com.getstream.sdk.chat.view.MessageListViewStyle
 import java.text.DateFormat
 
-
 class BubbleMessageViewHolder(resId: Int, viewGroup: ViewGroup?) :
     BaseMessageListItemViewHolder(resId, viewGroup) {
     private val header: Space = itemView.findViewById(R.id.space_header)
@@ -37,11 +36,11 @@ class BubbleMessageViewHolder(resId: Int, viewGroup: ViewGroup?) :
         this.messageListItem = messageListItem
 
         when (this.messageListItem.type) {
-            MESSAGEITEM_DATE_SEPARATOR -> {
-                configDate()
-            }
             MESSAGEITEM_MESSAGE -> {
                 configMessage()
+            }
+            MESSAGEITEM_DATE_SEPARATOR -> {
+                configDate()
             }
             else -> {
                 header.visibility = View.GONE

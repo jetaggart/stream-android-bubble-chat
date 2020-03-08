@@ -32,6 +32,4 @@
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintTop_toBottomOf="@+id/tv_username"
         />
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>
