@@ -11,27 +11,22 @@ import com.getstream.sdk.chat.rest.User
 import com.getstream.sdk.chat.viewmodel.ChannelListViewModel
 import java.util.*
 
-/**
- * This activity shows a list of channels
- */
 class MainActivity : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
 
         // setup the client using the example API key
         // normally you would call init in your Application class and not the activity
-        StreamChat.init("3fjyncqw9raj", this.applicationContext)
+        StreamChat.init("<STREAM_API_KEY>", this.applicationContext)
         val client = StreamChat.getInstance(this.application)
         val extraData = HashMap<String, Any>()
-        extraData["name"] = "Paranoid Android"
-        extraData["image"] = "https://bit.ly/2TIt8NR"
-        val currentUser = User("raspy-scene-1", extraData)
+        extraData["name"] = "<USERNAME>"
+        extraData["image"] = "<PROFILE_IMAGE_URL>"
+        val currentUser = User("<USER_ID>", extraData)
         // User token is typically provided by your server when the user authenticates
         client.setUser(
             currentUser,
-            "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoicmFzcHktc2NlbmUtMSJ9.GYK_RrawiaiRke_hrLIoFa9FWJSPNs9a5wl8_nPo6YQ"
+            "<STREAM_FRONTEND_TOKEN>"
         )
 
         // we're using data binding in this example
@@ -46,7 +41,7 @@ class MainActivity : AppCompatActivity() {
         binding.channelList.setViewModel(viewModel, this)
 
         // query all channels of type messaging
-        val filter = and(eq("type", "messaging"), `in`("members", "raspy-scene-1"))
+        val filter = and(eq("type", "messaging"), `in`("members", currentUser.id))
         viewModel.setChannelFilter(filter)
 
         // click handlers for clicking a user avatar or channel
@@ -54,9 +49,5 @@ class MainActivity : AppCompatActivity() {
             val intent = ChannelActivity.newIntent(this, channel)
             startActivity(intent)
         }
-        binding.channelList.setOnUserClickListener { user ->
-            // open your user profile
-        }
-
     }
 }

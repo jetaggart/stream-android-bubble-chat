@@ -13,7 +13,7 @@ import com.getstream.sdk.chat.view.MessageInputView
 import com.getstream.sdk.chat.viewmodel.ChannelViewModel
 import com.getstream.sdk.chat.viewmodel.ChannelViewModelFactory
 
-class ChannelActivity : AppCompatActivity(), MessageInputView.OpenCameraViewListener {
+class ChannelActivity : AppCompatActivity() {
     private var viewModel: ChannelViewModel? = null
     private var binding: ActivityChannelBinding? = null
 
@@ -34,29 +34,11 @@ class ChannelActivity : AppCompatActivity(), MessageInputView.OpenCameraViewList
             ChannelViewModelFactory(this.application, channel)
         ).get(ChannelViewModel::class.java)
 
-        binding!!.messageInput.setOpenCameraViewListener(this)
-
         binding!!.viewModel = viewModel
         binding!!.messageList.setViewHolderFactory(BubbleMessageViewHolderFactory())
         binding!!.messageList.setViewModel(viewModel!!, this)
         binding!!.messageInput.setViewModel(viewModel, this)
         binding!!.channelHeader.setViewModel(viewModel, this)
-    }
-
-    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        binding!!.messageInput.captureMedia(requestCode, resultCode, data)
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        binding!!.messageInput.permissionResult(requestCode, permissions, grantResults)
-    }
-
-    override fun openCameraView(intent: Intent, REQUEST_CODE: Int) {
-        startActivityForResult(intent, REQUEST_CODE)
     }
 
     companion object {
